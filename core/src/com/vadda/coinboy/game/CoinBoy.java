@@ -8,26 +8,67 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class CoinBoy extends ApplicationAdapter {
 	SpriteBatch batch;
-	Texture img;
+	// Texture for any visuals
+	Texture background;
+	Texture[] man;
+	int manState = 0; // What frame the man is in
+	int pause = 0;
+	float gravity = 0.2f;
+	float velocity = 0;
+	int manY = 0; // His location
 	
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		img = new Texture("badlogic.jpg");
+		background = new Texture("bg.png");
+		man = new Texture[4];
+		man[0] = new Texture("frame-1.png");
+		man[1] = new Texture("frame-2.png");
+		man[2] = new Texture("frame-3.png");
+		man[3] = new Texture("frame-4.png");
+
+		manY = Gdx.graphics.getHeight() / 2;
 	}
 
+	/**
+	 * This will run over and over until the end
+	 */
 	@Override
 	public void render () {
-		Gdx.gl.glClearColor(1, 0, 0, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		batch.begin();
-		batch.draw(img, 0, 0);
-		batch.end();
+        batch.begin();
+        batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+        // Recognizes screen touch
+        if(Gdx.input.justTouched()) {
+            velocity = -10;
+        }
+
+        if(pause < 5) {
+        	pause++;
+		} else {
+
+        	pause = 0;
+			if (manState < 3) {
+				manState++;
+			} else{
+				manState = 0;
+			}
+		}
+
+		velocity += gravity;
+        manY -= velocity;
+
+        if(manY <= 0) {
+        	manY = 0;
+		}
+
+        batch.draw(man[manState], Gdx.graphics.getWidth() / 2 - man[manState].getWidth() / 2, manY);
+
+        batch.end();
 	}
 	
 	@Override
 	public void dispose () {
 		batch.dispose();
-		img.dispose();
 	}
 }
